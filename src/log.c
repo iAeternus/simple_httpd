@@ -34,18 +34,18 @@ static void log_message(const char* level, const char* fmt, va_list args) {
     time_t now;
     time(&now);
     struct tm* local_time = localtime(&now);
+    pid_t pid = getpid();
 
-    // 打印时间戳和日志级别
-    dprintf(log_fd, "[%04d-%02d-%02d %02d:%02d:%02d] [%5s] ",
+    dprintf(log_fd, "[%04d-%02d-%02d %02d:%02d:%02d] [%5s] [pid=%d] ",
             local_time->tm_year + 1900,
             local_time->tm_mon + 1,
             local_time->tm_mday,
             local_time->tm_hour,
             local_time->tm_min,
             local_time->tm_sec,
-            level);
+            level,
+            pid);
 
-    // 打印日志内容
     vdprintf(log_fd, fmt, args);
     dprintf(log_fd, "\n");
 }
