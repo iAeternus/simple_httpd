@@ -13,9 +13,4 @@ void process_init(void);
  */
 int process_fork_worker(int client_fd, conn_handler_t handler);
 
-// /**
-//  * @brief SIGCHLD 回收
-//  */
-// void process_reap_children(void);
-
 #endif
