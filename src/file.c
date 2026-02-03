@@ -50,10 +50,11 @@ const char* file_get_mime(const char* path) {
 }
 
 int file_send(int fd, const char* path) {
+    int ret = -1;
     int file_fd = open(path, O_RDONLY);
     if (file_fd < 0) {
         err_set("Unable to open file: %s", path);
-        return -1;
+        goto cleanup;
     }
 
     char buf[1024];
@@ -61,17 +62,19 @@ int file_send(int fd, const char* path) {
     while ((n = read(file_fd, buf, sizeof(buf))) > 0) {
         if (net_writen(fd, buf, n) < 0) {
             err_set("Failed to send file data to client: %s", err_last());
-            close(file_fd);
-            return -1;
+            goto cleanup;
         }
     }
 
     if (n < 0) {
         err_set("Failed to read file: %s", err_last());
-        close(file_fd);
-        return -1;
+        goto cleanup;
     }
 
-    close(file_fd);
-    return 0;
+    ret = 0;
+cleanup:
+    if (file_fd >= 0) {
+        close(file_fd);
+    }
+    return ret;
 }

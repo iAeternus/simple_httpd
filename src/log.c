@@ -1,8 +1,34 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <time.h>
 #include "log.h"
+
+static int log_fd = STDERR_FILENO;
+
+int log_init(const char* path) {
+    if (!path) {
+        log_fd = STDERR_FILENO;
+        return 0;
+    }
+
+    int fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd < 0) {
+        perror("open log file");
+        return -1;
+    }
+
+    log_fd = fd;
+    return 0;
+}
+
+void log_close() {
+    if (log_fd != STDERR_FILENO) {
+        close(log_fd);
+        log_fd = STDERR_FILENO;
+    }
+}
 
 static void log_message(const char* level, const char* fmt, va_list args) {
     time_t now;
@@ -10,7 +36,7 @@ static void log_message(const char* level, const char* fmt, va_list args) {
     struct tm* local_time = localtime(&now);
 
     // 打印时间戳和日志级别
-    dprintf(STDERR_FILENO, "[%04d-%02d-%02d %02d:%02d:%02d] [%5s] ",
+    dprintf(log_fd, "[%04d-%02d-%02d %02d:%02d:%02d] [%5s] ",
             local_time->tm_year + 1900,
             local_time->tm_mon + 1,
             local_time->tm_mday,
@@ -20,8 +46,8 @@ static void log_message(const char* level, const char* fmt, va_list args) {
             level);
 
     // 打印日志内容
-    vdprintf(STDERR_FILENO, fmt, args);
-    dprintf(STDERR_FILENO, "\n");
+    vdprintf(log_fd, fmt, args);
+    dprintf(log_fd, "\n");
 }
 
 void log_trace(const char* fmt, ...) {

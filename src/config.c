@@ -56,7 +56,7 @@ int config_load(const char* path, struct server_config_t* conf) {
                 } else {
                     strncpy(conf->root, value, MAX_PATH_LEN - 1);
                 }
-            } else if (strcmp(key, "log_file") == 0) {
+            } else if (strcmp(key, "log") == 0) {
                 // 同样支持相对路径的 log 文件路径
                 if (value[0] != '/') {
                     char cwd[256];
@@ -64,9 +64,9 @@ int config_load(const char* path, struct server_config_t* conf) {
                         err_set("Failed to get current working directory: %s", strerror(errno));
                         return -1;
                     }
-                    snprintf(conf->log_file, MAX_PATH_LEN, "%s/%s", cwd, value);
+                    snprintf(conf->log, MAX_PATH_LEN, "%s/%s", cwd, value);
                 } else {
-                    strncpy(conf->log_file, value, MAX_PATH_LEN - 1);
+                    strncpy(conf->log, value, MAX_PATH_LEN - 1);
                 }
             }
         }
@@ -80,5 +80,5 @@ void config_dump(const struct server_config_t* conf) {
     log_info("Server configuration:");
     log_info("  Port: %d", conf->port);
     log_info("  Root directory: %s", conf->root);
-    log_info("  Log file: %s", conf->log_file);
+    log_info("  Log file: %s", conf->log);
 }

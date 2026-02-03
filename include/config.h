@@ -4,9 +4,9 @@
 #define MAX_PATH_LEN 256
 
 struct server_config_t {
-    int port;                    // 监听端口
-    char root[MAX_PATH_LEN];     // 服务器根目录
-    char log_file[MAX_PATH_LEN]; // 日志文件路径
+    int port;                // 监听端口
+    char root[MAX_PATH_LEN]; // 服务器根目录
+    char log[MAX_PATH_LEN];  // 日志文件路径
 };
 
 /**

@@ -77,7 +77,17 @@
             padding: 0.6rem 0.8rem;
             font-family: monospace;
             color: #a5f3fc;
+            text-decoration: none;
+            transition: all 0.2s ease;
         }
+
+        .api-item:hover {
+            background: #020617;
+            border-color: #38bdf8;
+            color: #7dd3fc;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+        }
+
 
         footer {
             text-align: center;
@@ -140,31 +150,60 @@
         <section>
             <h2>⚙ Core Linux APIs Used</h2>
             <div class="api-grid">
-                <div class="api-item">socket()</div>
-                <div class="api-item">bind()</div>
-                <div class="api-item">listen()</div>
-                <div class="api-item">accept()</div>
-                <div class="api-item">fork()</div>
-                <div class="api-item">read()</div>
-                <div class="api-item">write()</div>
-                <div class="api-item">open()</div>
-                <div class="api-item">stat()</div>
-                <div class="api-item">close()</div>
-                <div class="api-item">signal()</div>
-                <div class="api-item">waitpid()</div>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/socket.2.html"
+                    target="_blank">socket()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/bind.2.html" target="_blank">bind()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/listen.2.html"
+                    target="_blank">listen()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/accept.2.html"
+                    target="_blank">accept()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/fork.2.html" target="_blank">fork()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/read.2.html" target="_blank">read()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/write.2.html"
+                    target="_blank">write()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/open.2.html" target="_blank">open()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/stat.2.html" target="_blank">stat()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/close.2.html"
+                    target="_blank">close()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/signal.2.html"
+                    target="_blank">signal()</a>
+                <a class="api-item" href="https://man7.org/linux/man-pages/man2/waitpid.2.html"
+                    target="_blank">waitpid()</a>
             </div>
         </section>
 
         <section>
             <h2>🧠 Internal Workflow</h2>
             <ul>
-                <li>Create listening socket with <code>socket</code> and <code>bind</code></li>
-                <li>Wait for connections using <code>accept</code></li>
-                <li>Fork a worker process using <code>fork</code></li>
+                <li>
+                    Create listening socket with
+                    <a href="https://man7.org/linux/man-pages/man2/socket.2.html"
+                        target="_blank"><code>socket()</code></a>
+                    and
+                    <a href="https://man7.org/linux/man-pages/man2/bind.2.html" target="_blank"><code>bind()</code></a>
+                </li>
+                <li>
+                    Wait for connections using
+                    <a href="https://man7.org/linux/man-pages/man2/accept.2.html"
+                        target="_blank"><code>accept()</code></a>
+                </li>
+                <li>
+                    Fork a worker process using
+                    <a href="https://man7.org/linux/man-pages/man2/fork.2.html" target="_blank"><code>fork()</code></a>
+                </li>
                 <li>Parse HTTP request line and headers</li>
-                <li>Map URL path to real file path</li>
+                <li>
+                    Map URL path to real file path using
+                    <a href="https://man7.org/linux/man-pages/man2/stat.2.html" target="_blank"><code>stat()</code></a>
+                </li>
                 <li>Send HTTP response headers</li>
-                <li>Send file content using <code>read/write</code></li>
+                <li>
+                    Send file content using
+                    <a href="https://man7.org/linux/man-pages/man2/read.2.html" target="_blank"><code>read()</code></a>
+                    and
+                    <a href="https://man7.org/linux/man-pages/man2/write.2.html"
+                        target="_blank"><code>write()</code></a>
+                </li>
             </ul>
         </section>
 
