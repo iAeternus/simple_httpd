@@ -5,18 +5,18 @@
 #include <fcntl.h>
 #include "http.h"
 #include "error.h"
-#include "file.h"
+// #include "file.h"
 #include "log.h"
-#include "net.h"
+#include "rio.h"
 
-int http_read_request(int fd, struct http_request_t* req) {
+int http_read_request(rio_t* rp, struct http_request_t* req) {
     memset(req, 0, sizeof(struct http_request_t));
 
     ssize_t n;
     char buf[1024];
 
     // 读取请求行
-    n = net_readline(fd, buf, sizeof(buf));
+    n = rio_readlineb(rp, buf, sizeof(buf));
     if (n <= 0) {
         err_set("Failed to read request line: %s", err_last());
         return -1;
@@ -31,7 +31,7 @@ int http_read_request(int fd, struct http_request_t* req) {
 
     // 解析请求头
     while (1) {
-        n = net_readline(fd, buf, sizeof(buf));
+        n = rio_readlineb(rp, buf, sizeof(buf));
         if (n <= 0) {
             err_set("Failed to read request line: %s", err_last());
             return -1;
@@ -63,7 +63,7 @@ int http_read_request(int fd, struct http_request_t* req) {
     return 0;
 }
 
-int http_send_response(int fd, const struct http_response_t* resp) {
+int http_send_response(rio_t* rp, const struct http_response_t* resp) {
     int n;
     char buf[1024];
 
@@ -74,7 +74,7 @@ int http_send_response(int fd, const struct http_response_t* resp) {
         return -1;
     }
 
-    if (net_writen(fd, buf, n) < 0) {
+    if (rio_writen(rp->rio_fd, buf, n) < 0) {
         return -1;
     }
 
@@ -86,19 +86,19 @@ int http_send_response(int fd, const struct http_response_t* resp) {
             return -1;
         }
 
-        if (net_writen(fd, buf, n) < 0) {
+        if (rio_writen(rp->rio_fd, buf, n) < 0) {
             return -1;
         }
     }
 
     // 发送空行，表示头部结束
-    if (net_writen(fd, "\r\n", 2) < 0) {
+    if (rio_writen(rp->rio_fd, "\r\n", 2) < 0) {
         return -1;
     }
 
     // 发送响应体
     if (resp->body && resp->body_len > 0) {
-        if (net_writen(fd, resp->body, resp->body_len) < 0) {
+        if (rio_writen(rp->rio_fd, resp->body, resp->body_len) < 0) {
             return -1;
         }
     }
@@ -107,7 +107,7 @@ int http_send_response(int fd, const struct http_response_t* resp) {
     return 0;
 }
 
-int http_send_error(int fd, int status, const char* msg) {
+int http_send_error(rio_t* rp, int status, const char* msg) {
     struct http_response_t resp;
     memset(&resp, 0, sizeof(resp));
 
@@ -128,47 +128,47 @@ int http_send_error(int fd, int status, const char* msg) {
     resp.body_len = strlen(body);
 
     // 返回响应
-    return http_send_response(fd, &resp);
+    return http_send_response(rp, &resp);
 }
 
-int http_send_file_response(int fd, const char* path) {
-    struct stat st;
-    if (stat(path, &st) < 0) {
-        err_set("stat failed");
-        return -1;
-    }
+// int http_send_file_response(int fd, const char* path) {
+//     struct stat st;
+//     if (stat(path, &st) < 0) {
+//         err_set("stat failed");
+//         return -1;
+//     }
 
-    struct http_response_t resp;
-    memset(&resp, 0, sizeof(resp));
+//     struct http_response_t resp;
+//     memset(&resp, 0, sizeof(resp));
 
-    // 状态行
-    strcpy(resp.version, "HTTP/1.1");
-    resp.status_code = 200;
-    strcpy(resp.status_text, "OK");
+//     // 状态行
+//     strcpy(resp.version, "HTTP/1.1");
+//     resp.status_code = 200;
+//     strcpy(resp.status_text, "OK");
 
-    // Content-Type
-    snprintf(resp.headers[0].key, sizeof(resp.headers[0].key),
-             "Content-Type");
-    snprintf(resp.headers[0].value, sizeof(resp.headers[0].value),
-             "%s", file_get_mime(path));
+//     // Content-Type
+//     snprintf(resp.headers[0].key, sizeof(resp.headers[0].key),
+//              "Content-Type");
+//     snprintf(resp.headers[0].value, sizeof(resp.headers[0].value),
+//              "%s", file_get_mime(path));
 
-    // Content-Length
-    snprintf(resp.headers[1].key, sizeof(resp.headers[1].key),
-             "Content-Length");
-    snprintf(resp.headers[1].value, sizeof(resp.headers[1].value),
-             "%ld", st.st_size);
+//     // Content-Length
+//     snprintf(resp.headers[1].key, sizeof(resp.headers[1].key),
+//              "Content-Length");
+//     snprintf(resp.headers[1].value, sizeof(resp.headers[1].value),
+//              "%ld", st.st_size);
 
-    resp.header_count = 2;
+//     resp.header_count = 2;
 
-    // 先发响应头
-    if (http_send_response(fd, &resp) < 0) {
-        return -1;
-    }
+//     // 先发响应头
+//     if (http_send_response(fd, &resp) < 0) {
+//         return -1;
+//     }
 
-    // 再发文件内容
-    if (file_send(fd, path) < 0) {
-        return -1;
-    }
+//     // 再发文件内容
+//     if (file_send(fd, path) < 0) {
+//         return -1;
+//     }
 
-    return 0;
-}
+//     return 0;
+// }

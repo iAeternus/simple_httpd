@@ -28,12 +28,12 @@ int build_response_head(const char* path, struct http_response_t* resp);
  *   - 构造响应头
  *   - 发送文件内容
  *
- * @param fd        客户端连接的 socket fd
+ * @param rp        指向内部缓冲区的指针
  * @param req       已解析完成的 HTTP 请求
  * @param user_data 用户上下文（通常包含服务器配置）
  *
  * @return 0 成功，-1 失败
  */
-int file_service_handler(int fd, const struct http_request_t* req, void* user_data);
+int file_service_handler(rio_t* rp, const struct http_request_t* req, void* user_data);
 
 #endif // FILE_SERVICE_H

@@ -2,6 +2,7 @@
 #define HTTP_H
 
 #include <stdio.h>
+#include "rio.h"
 
 #define MAX_METHOD_LEN 8
 #define MAX_PATH_LEN 256
@@ -42,16 +43,16 @@ struct http_response_t {
 /**
  * @brief 从 socket 读取并解析请求
  */
-int http_read_request(int fd, struct http_request_t* req);
+int http_read_request(rio_t* rp, struct http_request_t* req);
 
 /**
  * @brief 构造并发送响应
  */
-int http_send_response(int fd, const struct http_response_t* resp);
+int http_send_response(rio_t* rp, const struct http_response_t* resp);
 
 /**
  * @brief 发送错误页面
  */
-int http_send_error(int fd, int status, const char* msg);
+int http_send_error(rio_t* rp, int status, const char* msg);
 
 #endif

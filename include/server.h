@@ -6,13 +6,13 @@
 /**
  * @brief HTTP业务回调
  * @note 框架层在解析完 HTTP 请求后调用该函数，将连接 fd、请求结构体以及用户上下文传给业务层处理
- * @param client_fd 已建立连接的 socket fd
+ * @param client_rp 绑定fd的内部缓冲区
  * @param req       已解析完成的 HTTP 请求
  * @param user_data 用户自定义上下文（由框架层透传）
  * @return 0 成功，-1 失败
  */
 typedef int (*http_handler_t)(
-    int client_fd,
+    rio_t* client_rp,
     const struct http_request_t* req,
     void* user_data);
 

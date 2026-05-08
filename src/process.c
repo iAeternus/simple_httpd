@@ -25,7 +25,7 @@ void process_init(void) {
     }
 }
 
-int process_fork_worker(int client_fd, conn_handler_t handler) {
+int process_fork_worker(rio_t* clinet_rp, conn_handler_t handler) {
     pid_t pid = fork();
     if (pid < 0) {
         err_set("fork failed: %s", strerror(errno));
@@ -33,7 +33,7 @@ int process_fork_worker(int client_fd, conn_handler_t handler) {
     }
 
     if (pid == 0) {
-        handler(client_fd);
+        handler(clinet_rp);
         _exit(0);
     }
 

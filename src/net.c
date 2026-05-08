@@ -56,73 +56,73 @@ int net_accept(int listen_fd) {
     }
 }
 
-ssize_t net_readn(int fd, void* buf, size_t n) {
-    size_t left = n;
-    char* ptr = buf;
+// ssize_t net_readn(int fd, void* buf, size_t n) {
+//     size_t left = n;
+//     char* ptr = buf;
 
-    while (left > 0) {
-        ssize_t nr = read(fd, ptr, left);
-        if (nr < 0) {
-            if (errno == EINTR) {
-                continue; // 被信号打断，重试
-            }
+//     while (left > 0) {
+//         ssize_t nr = read(fd, ptr, left);
+//         if (nr < 0) {
+//             if (errno == EINTR) {
+//                 continue; // 被信号打断，重试
+//             }
 
-            err_set("read failed: %s", strerror(errno));
-            return -1;
-        } else if (nr == 0) {
-            break; // 对端关闭连接
-        }
+//             err_set("read failed: %s", strerror(errno));
+//             return -1;
+//         } else if (nr == 0) {
+//             break; // 对端关闭连接
+//         }
 
-        left -= nr;
-        ptr += nr;
-    }
+//         left -= nr;
+//         ptr += nr;
+//     }
 
-    return n - left;
-}
+//     return n - left;
+// }
 
-ssize_t net_readline(int fd, char* buf, size_t maxlen) {
-    size_t i = 0;
-    char c;
-    ssize_t n;
+// ssize_t net_readline(int fd, char* buf, size_t maxlen) {
+//     size_t i = 0;
+//     char c;
+//     ssize_t n;
 
-    while (i < maxlen - 1) {
-        n = read(fd, &c, 1);
-        if (n == 1) {
-            buf[i++] = c;
-            if (c == '\n') {
-                break;
-            }
-        } else if (n == 0) {
-            break; // 对端关闭
-        } else {
-            if (errno == EINTR) continue;
-            err_set("readline failed: %s", strerror(errno));
-            return -1;
-        }
-    }
+//     while (i < maxlen - 1) {
+//         n = read(fd, &c, 1);
+//         if (n == 1) {
+//             buf[i++] = c;
+//             if (c == '\n') {
+//                 break;
+//             }
+//         } else if (n == 0) {
+//             break; // 对端关闭
+//         } else {
+//             if (errno == EINTR) continue;
+//             err_set("readline failed: %s", strerror(errno));
+//             return -1;
+//         }
+//     }
 
-    buf[i] = '\0';
-    return i;
-}
+//     buf[i] = '\0';
+//     return i;
+// }
 
-ssize_t net_writen(int fd, const void* buf, size_t n) {
-    size_t left = n;
-    const char* ptr = buf;
+// ssize_t net_writen(int fd, const void* buf, size_t n) {
+//     size_t left = n;
+//     const char* ptr = buf;
 
-    while (left > 0) {
-        ssize_t nw = write(fd, ptr, left);
-        if (nw < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
+//     while (left > 0) {
+//         ssize_t nw = write(fd, ptr, left);
+//         if (nw < 0) {
+//             if (errno == EINTR) {
+//                 continue;
+//             }
 
-            err_set("write failed: %s", strerror(errno));
-            return -1;
-        }
+//             err_set("write failed: %s", strerror(errno));
+//             return -1;
+//         }
 
-        left -= nw;
-        ptr += nw;
-    }
+//         left -= nw;
+//         ptr += nw;
+//     }
 
-    return n;
-}
+//     return n;
+// }

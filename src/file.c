@@ -5,7 +5,7 @@
 #include "file.h"
 #include "error.h"
 #include "log.h"
-#include "net.h"
+#include "rio.h"
 
 int file_map_path(const char* root,
                   const char* url_path,
@@ -49,7 +49,7 @@ const char* file_get_mime(const char* path) {
     return "application/octet-stream"; // 默认二进制流
 }
 
-int file_send(int fd, const char* path) {
+int file_send(rio_t* rp, const char* path) {
     int ret = -1;
     int file_fd = open(path, O_RDONLY);
     if (file_fd < 0) {
@@ -59,8 +59,8 @@ int file_send(int fd, const char* path) {
 
     char buf[1024];
     ssize_t n;
-    while ((n = read(file_fd, buf, sizeof(buf))) > 0) {
-        if (net_writen(fd, buf, n) < 0) {
+    while ((n = rio_readn(file_fd, buf, sizeof(buf))) > 0) {
+        if (rio_writen(rp->rio_fd, buf, n) < 0) {
             err_set("Failed to send file data to client: %s", err_last());
             goto cleanup;
         }

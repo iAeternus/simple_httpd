@@ -1,6 +1,7 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include "rio.h"
 #include <stdio.h>
 
 /**
@@ -19,6 +20,6 @@ const char* file_get_mime(const char* path);
 /**
  * @brief 发送文件
  */
-int file_send(int fd, const char* path);
+int file_send(rio_t* rp, const char* path);
 
 #endif

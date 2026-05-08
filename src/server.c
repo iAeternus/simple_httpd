@@ -7,26 +7,27 @@
 #include "log.h"
 #include "error.h"
 #include "http.h"
+#include "rio.h"
 
 static struct server_context g_ctx;
 static http_handler_t g_handler;
 
-static void handle_client(int client_fd) {
+static void handle_client(rio_t* client_rp) {
     struct http_request_t req;
     memset(&req, 0, sizeof(req));
 
-    if (http_read_request(client_fd, &req) < 0) {
+    if (http_read_request(client_rp, &req) < 0) {
         log_error("read request failed: %s", err_last());
-        http_send_error(client_fd, 400, "Bad Request");
+        http_send_error(client_rp, 400, "Bad Request");
         goto cleanup;
     }
 
     if (g_handler) {
-        g_handler(client_fd, &req, &g_ctx);
+        g_handler(client_rp, &req, &g_ctx);
     }
 
 cleanup:
-    close(client_fd);
+    close(client_rp->rio_fd);
 }
 
 int http_server_run(const char* conf_path, http_handler_t handler) {
@@ -62,7 +63,10 @@ int http_server_run(const char* conf_path, http_handler_t handler) {
             continue;
         }
 
-        if (process_fork_worker(client_fd, handle_client) < 0) {
+        rio_t client_r;
+        rio_readinitb(&client_r, client_fd);
+
+        if (process_fork_worker(&client_r, handle_client) < 0) {
             log_error("fork worker failed: %s", err_last());
             close(client_fd);
             continue;

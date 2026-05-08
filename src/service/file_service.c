@@ -38,20 +38,20 @@ int build_response_head(const char* path, struct http_response_t* resp) {
     return 0;
 }
 
-int file_service_handler(int fd, const struct http_request_t* req, void* user_data) {
+int file_service_handler(rio_t* rp, const struct http_request_t* req, void* user_data) {
     struct server_context* ctx = user_data;
     struct server_config_t* conf = ctx->conf;
 
     char real_path[512];
 
     if (strcmp(req->method, "GET") != 0 && strcmp(req->method, "POST") != 0) {
-        http_send_error(fd, 405, "Method Not Allowed");
+        http_send_error(rp, 405, "Method Not Allowed");
         return -1;
     }
 
     if (file_map_path(conf->root, req->path, real_path, sizeof(real_path)) < 0) {
         err_print();
-        http_send_error(fd, 404, "Not Found");
+        http_send_error(rp, 404, "Not Found");
         return -1;
     }
 
@@ -61,14 +61,14 @@ int file_service_handler(int fd, const struct http_request_t* req, void* user_da
         return -1;
     }
 
-    if (http_send_response(fd, &resp) < 0) {
+    if (http_send_response(rp, &resp) < 0) {
         err_print();
         return -1;
     }
 
-    if (file_send(fd, real_path) < 0) {
+    if (file_send(rp, real_path) < 0) {
         log_error("send file failed: %s", err_last());
-        http_send_error(fd, 500, "Internal Server Error");
+        http_send_error(rp, 500, "Internal Server Error");
         return -1;
     }
 
