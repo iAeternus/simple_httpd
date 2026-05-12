@@ -2,7 +2,6 @@
 #define FILE_H
 
 #include "rio.h"
-#include <stdio.h>
 
 /**
  * @brief 根据 URL 路径映射真实文件
